@@ -1,0 +1,118 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{memorias}[2025/12/30 Simple frame + wrap helpers]
+
+% Encoding and language
+\RequirePackage{ifxetex}
+\RequirePackage{ifluatex}
+\newif\ifxetexorluatex
+\ifxetex
+  \xetexorluatextrue
+\fi
+\ifluatex
+  \xetexorluatextrue
+\fi
+\ifxetexorluatex
+  \RequirePackage{fontspec}
+  \defaultfontfeatures{Ligatures=TeX}
+  \setmainfont{Latin Modern Roman}
+\else
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage[utf8]{inputenc}
+  \RequirePackage{lmodern}
+\fi
+\RequirePackage[spanish]{babel}
+
+% Layout and graphics
+\RequirePackage{geometry}
+\geometry{paper=a4paper, margin=1in}
+\RequirePackage{graphicx}
+\RequirePackage{wrapfig}
+\RequirePackage{caption}
+\RequirePackage{capt-of}
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\RequirePackage{eso-pic}
+\RequirePackage{xcolor}
+\RequirePackage{enumitem}
+
+% Colors for the frame
+\definecolor{memoriaframe}{HTML}{4C6EF5}
+\definecolor{memoriatint}{HTML}{E7ECFF}
+\definecolor{memoriadots}{HTML}{FDA65D}
+
+% Draws a soft frame around each page with fun icons
+\newcommand{\memoriasUseFrame}{%
+  \AddToShipoutPictureBG{%
+    \begin{tikzpicture}[remember picture,overlay]
+      \coordinate (nw) at ($(current page.north west)+(0.8cm,-0.8cm)$);
+      \coordinate (ne) at ($(current page.north east)+(-0.8cm,-0.8cm)$);
+      \coordinate (sw) at ($(current page.south west)+(0.8cm,0.8cm)$);
+      \coordinate (se) at ($(current page.south east)+(-0.8cm,0.8cm)$);
+      
+      % outer border
+      \draw[line width=2pt,color=memoriaframe,rounded corners=8pt]
+        (nw) rectangle (se);
+      % inner tinted border
+      \draw[line width=8pt,color=memoriatint,rounded corners=12pt]
+        ($(nw)+(0.35cm,-0.35cm)$) rectangle ($(se)+(-0.35cm,0.35cm)$);
+      
+      % Top left - Video game controller for Nico (simplified gamepad)
+      \begin{scope}[shift={($(nw)+(1.2cm,-1.2cm)$)}]
+        \fill[memoriadots,rounded corners=3pt] (-0.4,0) rectangle (0.4,-0.25);
+        \fill[memoriadots] (-0.25,0.05) circle (0.15);
+        \fill[memoriadots] (0.25,0.05) circle (0.15);
+        \fill[black] (-0.2,-0.1) circle (0.05);
+        \fill[black] (0.2,-0.1) circle (0.05);
+        \draw[black,line width=0.5pt] (-0.15,-0.15) -- (-0.15,-0.25);
+        \draw[black,line width=0.5pt] (-0.2,-0.2) -- (-0.1,-0.2);
+      \end{scope}
+      
+      % Top right - Doll for Cami (simple dress figure)
+      \begin{scope}[shift={($(ne)+(-1.2cm,-1.2cm)$)}]
+        \fill[pink!70] (0,0) circle (0.15); % head
+        \fill[pink!60] (0,-0.3) -- (-0.25,-0.6) -- (0.25,-0.6) -- cycle; % dress
+        \draw[black,line width=0.5pt] (-0.15,-0.3) -- (-0.25,-0.5);
+        \draw[black,line width=0.5pt] (0.15,-0.3) -- (0.25,-0.5);
+        \fill[black] (-0.05,0.05) circle (0.02);
+        \fill[black] (0.05,0.05) circle (0.02);
+      \end{scope}
+      
+      % Bottom left - Another gamepad
+      \begin{scope}[shift={($(sw)+(1.2cm,1.2cm)$)}]
+        \fill[memoriadots,rounded corners=3pt] (-0.4,0) rectangle (0.4,-0.25);
+        \fill[memoriadots] (-0.25,0.05) circle (0.15);
+        \fill[memoriadots] (0.25,0.05) circle (0.15);
+        \fill[black] (-0.2,-0.1) circle (0.05);
+        \fill[black] (0.2,-0.1) circle (0.05);
+        \draw[black,line width=0.5pt] (0.15,-0.15) -- (0.15,-0.25);
+        \draw[black,line width=0.5pt] (0.1,-0.2) -- (0.2,-0.2);
+      \end{scope}
+      
+      % Bottom right - Another doll
+      \begin{scope}[shift={($(se)+(-1.2cm,1.2cm)$)}]
+        \fill[pink!70] (0,0) circle (0.15);
+        \fill[pink!60] (0,-0.3) -- (-0.25,-0.6) -- (0.25,-0.6) -- cycle;
+        \draw[black,line width=0.5pt] (-0.15,-0.3) -- (-0.25,-0.5);
+        \draw[black,line width=0.5pt] (0.15,-0.3) -- (0.25,-0.5);
+        \fill[black] (-0.05,0.05) circle (0.02);
+        \fill[black] (0.05,0.05) circle (0.02);
+      \end{scope}
+      
+    \end{tikzpicture}%
+  }%
+}
+
+% Global list styling
+\setlist[itemize]{leftmargin=*}
+
+% Helper to wrap an image with text flowing around it
+% Usage: \memoriasWrapImage[placement]{width}{filename}{caption}
+% placement: r (right) or l (left)
+\newcommand{\memoriasWrapImage}[4][r]{%
+  \begin{wrapfigure}{#1}{#2}
+    \vspace{-8pt}% tightens top whitespace
+    \includegraphics[width=\linewidth]{#3}%
+    \captionsetup{labelformat=empty}% hide "Figure X"
+    \caption{#4}
+  \end{wrapfigure}%
+}
